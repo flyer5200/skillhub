@@ -29,6 +29,7 @@ public class RouteSecurityPolicyRegistry {
             RouteAuthorizationPolicy.permitAll(null, "/api/v1/auth/device/**"),
             RouteAuthorizationPolicy.permitAll(null, "/api/v1/check"),
             RouteAuthorizationPolicy.permitAll(null, "/actuator/health"),
+            RouteAuthorizationPolicy.permitAll(null, "/actuator/health/**"),
             RouteAuthorizationPolicy.permitAll(null, "/v3/api-docs/**"),
             RouteAuthorizationPolicy.permitAll(null, "/swagger-ui/**"),
             RouteAuthorizationPolicy.permitAll(null, "/.well-known/**"),
