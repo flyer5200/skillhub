@@ -55,6 +55,7 @@ spring:
             client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET:placeholder}
             client-name: GitHub
             scope: read:user,user:email
+            redirect_uri: "${SKILLHUB_PUBLIC_BASE_URL}/login/oauth2/code/github"
           dingtalk:
             client-id: ${OAUTH2_DINGTALK_CLIENT_ID:placeholder}
             client-secret: ${OAUTH2_DINGTALK_CLIENT_SECRET:placeholder}
