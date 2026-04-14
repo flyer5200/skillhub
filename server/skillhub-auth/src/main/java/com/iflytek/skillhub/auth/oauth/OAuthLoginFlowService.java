@@ -101,10 +101,12 @@ public class OAuthLoginFlowService {
                 && "access_denied".equals(oauth2Exception.getError().getErrorCode())) {
             return "/access-denied";
         }
+        // Fallback: redirect to login with error info for any other OAuth failures
         if (returnTo != null) {
-            return "/login?returnTo=" + URLEncoder.encode(returnTo, StandardCharsets.UTF_8);
+            return "/login?returnTo=" + URLEncoder.encode(returnTo, StandardCharsets.UTF_8)
+                    + "&error=" + URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
         }
-        return null;
+        return "/login?error=" + URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
     }
 
     public record AuthenticatedLoginContext(OAuth2User upstreamUser, PlatformPrincipal principal) {

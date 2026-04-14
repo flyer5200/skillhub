@@ -53,10 +53,23 @@ spring:
           github:
             client-id: ${OAUTH2_GITHUB_CLIENT_ID:placeholder}
             client-secret: ${OAUTH2_GITHUB_CLIENT_SECRET:placeholder}
+            client-name: GitHub
             scope: read:user,user:email
+          dingtalk:
+            client-id: ${OAUTH2_DINGTALK_CLIENT_ID:placeholder}
+            client-secret: ${OAUTH2_DINGTALK_CLIENT_SECRET:placeholder}
+            client-name: DingTalk
+            scope: openid
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
         provider:
           github:
             user-info-uri: https://api.github.com/user
+          dingtalk:
+            authorization-uri: https://login.dingtalk.com/oauth2/auth
+            token-uri: https://api.dingtalk.com/v1.0/oauth2/userAccessToken
+            user-info-uri: https://api.dingtalk.com/v1.0/contact/users/me
+            user-name-attribute: openid
   servlet:
     multipart:
       max-file-size: 100MB

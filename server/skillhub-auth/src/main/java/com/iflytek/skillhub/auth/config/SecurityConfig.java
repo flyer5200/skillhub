@@ -1,6 +1,7 @@
 package com.iflytek.skillhub.auth.config;
 
 import com.iflytek.skillhub.auth.oauth.CustomOAuth2UserService;
+import com.iflytek.skillhub.auth.oauth.DingTalkTokenResponseClient;
 import com.iflytek.skillhub.auth.oauth.OAuth2LoginFailureHandler;
 import com.iflytek.skillhub.auth.oauth.OAuth2LoginSuccessHandler;
 import com.iflytek.skillhub.auth.oauth.SkillHubOAuth2AuthorizationRequestResolver;
@@ -11,7 +12,6 @@ import com.iflytek.skillhub.auth.token.ApiTokenScopeFilter;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -51,6 +51,7 @@ public class SecurityConfig {
             "form-action 'self'");
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final DingTalkTokenResponseClient dingTalkTokenResponseClient;
     private final SkillHubOAuth2AuthorizationRequestResolver authorizationRequestResolver;
     private final OAuth2LoginSuccessHandler successHandler;
     private final OAuth2LoginFailureHandler failureHandler;
@@ -62,6 +63,7 @@ public class SecurityConfig {
     private final RouteSecurityPolicyRegistry routeSecurityPolicyRegistry;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService,
+                          DingTalkTokenResponseClient dingTalkTokenResponseClient,
                           SkillHubOAuth2AuthorizationRequestResolver authorizationRequestResolver,
                           OAuth2LoginSuccessHandler successHandler,
                           OAuth2LoginFailureHandler failureHandler,
@@ -72,6 +74,7 @@ public class SecurityConfig {
                           ObjectProvider<MockAuthFilter> mockAuthFilterProvider,
                           RouteSecurityPolicyRegistry routeSecurityPolicyRegistry) {
         this.customOAuth2UserService = customOAuth2UserService;
+        this.dingTalkTokenResponseClient = dingTalkTokenResponseClient;
         this.authorizationRequestResolver = authorizationRequestResolver;
         this.successHandler = successHandler;
         this.failureHandler = failureHandler;
@@ -107,11 +110,17 @@ public class SecurityConfig {
                 .ignoringRequestMatchers(csrfIgnoreMatcher)
             )
             .authorizeHttpRequests(auth -> {
+                // Allow OAuth2 callback paths before any authentication requirements
+                auth.requestMatchers(
+                    new AntPathRequestMatcher("/login/oauth2/code/**"),
+                    new AntPathRequestMatcher("/oauth2/authorization/**")
+                ).permitAll();
                 configureRoutePolicies(auth);
                 auth.anyRequest().authenticated();
             })
             .oauth2Login(oauth2 -> oauth2
                 .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(authorizationRequestResolver))
+                .tokenEndpoint(token -> token.accessTokenResponseClient(dingTalkTokenResponseClient))
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 .successHandler(successHandler)
                 .failureHandler(failureHandler)
